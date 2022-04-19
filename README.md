@@ -38,10 +38,10 @@ These 2 will listen to the default queues;
 ```
 
 ```bash
-go run .\cmd\cli tasks handler 
+go run ./cmd/cli tasks handler 
 ```
 ```bash
-go run .\cmd\cli tasks handler 
+go run ./cmd/cli tasks handler 
 ```
 
 ### 2 Other Servers 
@@ -52,10 +52,10 @@ These 2 will listen to a single herb queue;
 ```
 
 ```bash
-go run .\cmd\cli\ tasks handler -q herb:1
+go run ./cmd/cli tasks handler -q herb:1
 ```
 ```bash
-go run .\cmd\cli\ tasks handler -q herb:1 
+go run ./cmd/cli tasks handler -q herb:1 
 ```
 
 ## Publish some messages
@@ -64,12 +64,12 @@ We need to send at a minimum 1000 through because they get processed so fast tha
 
 
 ```bash
-go run .\cmd\cli\ tasks publisher -q critical -c 1000
-go run .\cmd\cli\ tasks publisher -q default -c 1000
-go run .\cmd\cli\ tasks publisher -q low -c 1000
+go run ./cmd/cli tasks publisher -q critical -c 1000
+go run ./cmd/cli tasks publisher -q default -c 1000
+go run ./cmd/cli tasks publisher -q low -c 1000
 ```
 
 ```bash
-go run .\cmd\cli\ tasks publisher -q herb -c 1000
+go run ./cmd/cli tasks publisher -q herb -c 1000
 ```
 
