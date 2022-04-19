@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"cobra_starter/cmd/cli/cmd/about"
+	"cobra_starter/cmd/cli/cmd/tasks"
 	"cobra_starter/cmd/cli/cmd/version"
 
 	"github.com/spf13/cobra"
@@ -50,4 +51,5 @@ func init() {
 
 	about.InitCommand(rootCmd)
 	version.InitCommand(rootCmd)
+	tasks.InitCommand(rootCmd)
 }

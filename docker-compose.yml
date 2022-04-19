@@ -1,0 +1,66 @@
+version: "3.9"
+
+services:
+
+ # reverse-proxy
+ #============================================================================
+  reverse-proxy:
+    # The official v2 Traefik docker image
+    image: traefik:v2.6
+    # Enables the web UI and tells Traefik to listen to docker
+    command: --api.insecure=true --providers.docker
+    ports:
+      # The HTTP port
+      - "80:80"
+      # The Web UI (enabled by --api.insecure=true)
+      - "8080:8080"
+    volumes:
+      # So that Traefik can listen to the Docker events
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - whoami
+      - asynqmon
+
+ # whoami
+ #============================================================================
+  whoami:
+    # A container that exposes an API to show its IP address
+    image: traefik/whoami
+    labels:
+      - "traefik.http.routers.whoami.rule=Host(`whoami.docker.localhost`)"
+  
+
+ # redis
+ #============================================================================
+  redis:
+      image: '${REDIS_IMAGE}:${REDIS_VERSION}'
+      restart: unless-stopped
+      ports:
+        - ${REDIS_PORT}:${REDIS_PORT}
+      volumes:
+        - 'redis_data:/redislabs/redis/data'
+      environment:
+        REDIS_PASSWORD: ${REDIS_PASSWORD}
+        ALLOW_EMPTY_PASSWORD: 'no'
+#        REDIS_DISABLE_COMMANDS: 'FLUSHDB, FLUSHALL'
+        #- REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+      command: redis-server --loadmodule "/usr/lib/redis/modules/rejson.so" --loadmodule "/usr/lib/redis/modules/redisearch.so" --requirepass "$REDIS_PASSWORD"
+
+  asynqmon:
+    image: hibiken/asynqmon:latest
+    labels:
+      - "traefik.http.routers.asynqmon.rule=Host(`asynqmon.docker.localhost`)"
+      - "traefik.http.services.asynqmon.loadbalancer.server.port=80"
+    container_name: asynqmon
+    ports:
+      - 8980:80
+    command:
+      - '--port=80'
+      - '--redis-addr=redis:${REDIS_PORT}'
+      - '--redis-password=${REDIS_PASSWORD}'
+    restart: always
+    depends_on:
+      - redis
+volumes:
+  redis_data:
+    driver: local
