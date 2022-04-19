@@ -1,5 +1,9 @@
 # cobra-starter
 
+## Install golang 1.18
+
+[installers](https://go.dev/dl/)
+
 ## github actions secrets
 
 [dockerhub access_token](https://hub.docker.com/settings/security)  
