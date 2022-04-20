@@ -18,6 +18,7 @@ import (
 )
 
 var queues []string
+var fail bool
 
 // handlerCmd represents the handler command
 var handlerCmd = &cobra.Command{
@@ -61,7 +62,11 @@ to quickly create a Cobra application.`,
 
 		// mux maps a type to a handler
 		mux := asynq.NewServeMux()
-		mux.HandleFunc(models.TypeEmailDelivery, task_handlers.HandleEmailDeliveryTask)
+		if fail {
+			mux.HandleFunc(models.TypeEmailDelivery, task_handlers.FailHandleEmailDeliveryTask)
+		} else {
+			mux.HandleFunc(models.TypeEmailDelivery, task_handlers.HandleEmailDeliveryTask)
+		}
 		// ...register other handlers...
 		sb := strings.Builder{}
 		for k, v := range queuesMap {
@@ -76,5 +81,7 @@ to quickly create a Cobra application.`,
 
 func InitCommand(parent *cobra.Command) {
 	parent.AddCommand(handlerCmd)
+
 	handlerCmd.Flags().StringArrayVarP(&queues, "queues", "q", []string{"critical:6", "default:3", "low:1"}, "queues to listen to")
+	handlerCmd.Flags().BoolVarP(&fail, "fail", "f", false, "fail to handle the task")
 }
