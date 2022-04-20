@@ -93,6 +93,12 @@ What I have notices.
 5. I noticed that the other server was NOT pulling the failed messages.  It was like they were locked to the failing server
 6. When I shut down the failing server and left the good server up, the good server started processing (slowly).   It looks like there is some pretty good backoff logic at work here.  
 
+Same test, but 1000 upfront messages.
+This time bringing up the second server helped and both were running.  The good server was now handling the messages.  
+
+However once the numbers got down to around 40 unprocesses failed messages the failing server seems to camp on that small set and every now and then the good server will peel one off.  From the looks of it I may be sitting here for hours hoping the good server finally gets to process them all.  
+
+
 
 
 
