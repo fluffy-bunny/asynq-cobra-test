@@ -77,3 +77,24 @@ go run ./cmd/cli tasks publisher -q low -c 1000
 go run ./cmd/cli tasks publisher -q herb -c 1000
 ```
 
+## Fail to process a message
+
+Lets spin up a server that fails to process a task.  It returns an error on everything.  
+
+```bash
+go run ./cmd/cli tasks handler -f 
+```
+
+What I have notices.
+1. I spun up a failing server  
+2. I sent 11 messages
+3. The failing server failed them all and then went into a retry cycle
+4. I spun up another server that would not fail.
+5. I noticed that the other server was NOT pulling the failed messages.  It was like they were locked to the failing server
+6. When I shut down the failing server and left the good server up, the good server started processing (slowly).   It looks like there is some pretty good backoff logic at work here.  
+
+
+
+
+
+
