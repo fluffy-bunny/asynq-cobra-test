@@ -1,6 +1,5 @@
 /*
 Copyright © 2022 NAME HERE <EMAIL ADDRESS>
-
 */
 package publisher
 
@@ -17,6 +16,7 @@ import (
 
 var count int
 var queuename string
+var fail bool
 
 // publisherCmd represents the publisher command
 var publisherCmd = &cobra.Command{
@@ -40,7 +40,7 @@ to quickly create a Cobra application.`,
 			options = append(options, asynq.Queue(queuename))
 		}
 		for i := 0; i < count; i++ {
-			task, err := models.NewEmailDeliveryTask(i, "some:template:id")
+			task, err := models.NewEmailDeliveryTask(i, "some:template:id", fail)
 			if err != nil {
 				log.Fatalf("could not create task: %v", err)
 			}
@@ -53,7 +53,7 @@ to quickly create a Cobra application.`,
 			}
 
 		}
-		fmt.Printf("enqueued %d tasks\n", count)
+		fmt.Printf("enqueued %d tasks fail:%v\n", count, fail)
 
 	},
 }
@@ -61,6 +61,7 @@ to quickly create a Cobra application.`,
 func InitCommand(parent *cobra.Command) {
 	parent.AddCommand(publisherCmd)
 	publisherCmd.Flags().IntVarP(&count, "count", "c", 1, "count")
+	publisherCmd.Flags().BoolVarP(&fail, "fail", "f", false, "fail to handle the task")
 
 	publisherCmd.Flags().StringVarP(&queuename, "queuename", "q", "", "queuename")
 }

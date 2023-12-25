@@ -41,6 +41,10 @@ func HandleEmailDeliveryTask(ctx context.Context, t *asynq.Task) error {
 	if err := json.Unmarshal(t.Payload(), &p); err != nil {
 		return fmt.Errorf("json.Unmarshal failed: %v: %w", err, asynq.SkipRetry)
 	}
+	if p.FailIt {
+		fmt.Printf("...FAILED... enqueued task %d: Sending Email to User: user_id=%d, template_id=%s\n", count, p.UserID, p.TemplateID)
+		return errors.New("failed to send email: marked as a failure")
+	}
 	count++
 	if math.Mod(float64(count), 1) == 0 {
 		fmt.Printf("enqueued task %d: Sending Email to User: user_id=%d, template_id=%s\n", count, p.UserID, p.TemplateID)

@@ -11,13 +11,21 @@
         "program": "${fileDirname}"
     },
     {
-        "name": "handler",
+        "name": "handler-herb:6",
         "type": "go",
         "request": "launch",
         "mode": "debug",
         "program": "${workspaceFolder}/cmd/cli",
         "env": { },
         "args": [ "tasks","handler","-q","herb:6" ]
+    }, {
+        "name": "handler",
+        "type": "go",
+        "request": "launch",
+        "mode": "debug",
+        "program": "${workspaceFolder}/cmd/cli",
+        "env": { },
+        "args": [ "tasks","handler" ]
     },
 ]
 }

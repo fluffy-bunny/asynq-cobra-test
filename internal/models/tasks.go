@@ -13,6 +13,8 @@ const (
 type EmailDeliveryPayload struct {
 	UserID     int
 	TemplateID string
+	// marks this as a message that all the workers will fail to process
+	FailIt bool
 }
 
 //----------------------------------------------
@@ -20,8 +22,12 @@ type EmailDeliveryPayload struct {
 // A task consists of a type and a payload.
 //----------------------------------------------
 
-func NewEmailDeliveryTask(userID int, tmplID string) (*asynq.Task, error) {
-	payload, err := json.Marshal(EmailDeliveryPayload{UserID: userID, TemplateID: tmplID})
+func NewEmailDeliveryTask(userID int, tmplID string, failit bool) (*asynq.Task, error) {
+	payload, err := json.Marshal(EmailDeliveryPayload{
+		UserID:     userID,
+		TemplateID: tmplID,
+		FailIt:     failit,
+	})
 	if err != nil {
 		return nil, err
 	}
