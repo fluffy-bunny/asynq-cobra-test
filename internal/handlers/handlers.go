@@ -47,7 +47,7 @@ func HandleEmailDeliveryTask(ctx context.Context, t *asynq.Task) error {
 	}
 	count++
 	if math.Mod(float64(count), 1) == 0 {
-		fmt.Printf("enqueued task %d: Sending Email to User: user_id=%d, template_id=%s\n", count, p.UserID, p.TemplateID)
+		fmt.Printf("...SUCCESS... enqueued task %d: Sending Email to User: user_id=%d, template_id=%s\n", count, p.UserID, p.TemplateID)
 	}
 
 	// Email delivery code ...
