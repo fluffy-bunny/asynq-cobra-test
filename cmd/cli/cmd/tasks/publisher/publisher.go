@@ -6,6 +6,7 @@ package publisher
 import (
 	"cobra_starter/internal/cobra_utils"
 	"cobra_starter/internal/models"
+	"encoding/json"
 	"fmt"
 	"math"
 
@@ -18,6 +19,7 @@ var count int
 var queuename string
 var fail bool
 var group string
+var maxRetry int
 
 // publisherCmd represents the publisher command
 var publisherCmd = &cobra.Command{
@@ -40,8 +42,18 @@ to quickly create a Cobra application.`,
 		if queuename != "" {
 			options = append(options, asynq.Queue(queuename))
 		}
+		options = append(options, asynq.MaxRetry(maxRetry))
 		if len(group) > 0 {
-			options = append(options, asynq.Group(group))
+			gg := &models.Group{
+				OrgId: group,
+				Event: "some:event",
+			}
+			groupS, err := json.Marshal(gg)
+			if err != nil {
+				log.Fatal().Err(err).Msg("could not marshal group")
+				return
+			}
+			options = append(options, asynq.Group(string(groupS)))
 		}
 		log.Info().Interface("options", options).Msg("options")
 		for i := 0; i < count; i++ {
@@ -66,6 +78,8 @@ to quickly create a Cobra application.`,
 func InitCommand(parent *cobra.Command) {
 	parent.AddCommand(publisherCmd)
 	publisherCmd.Flags().IntVarP(&count, "count", "c", 1, "count")
+	publisherCmd.Flags().IntVar(&maxRetry, "maxRetry", 3, "max retry")
+
 	publisherCmd.Flags().BoolVarP(&fail, "fail", "f", false, "fail to handle the task")
 	publisherCmd.Flags().StringVarP(&group, "group", "g", "", "enque to an aggregate group")
 

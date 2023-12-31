@@ -16,6 +16,8 @@ import (
 
 	"github.com/rs/zerolog"
 
+	asynq_log "cobra_starter/internal/log"
+
 	"github.com/hibiken/asynq"
 	"github.com/spf13/cobra"
 )
@@ -50,6 +52,7 @@ to quickly create a Cobra application.`,
 			queuesMap[key] = value
 
 		}
+		aLog := asynq_log.NewLogger()
 		cfg := asynq.Config{
 			// Specify how many concurrent workers to use
 			Concurrency: 10,
@@ -63,6 +66,12 @@ to quickly create a Cobra application.`,
 			BaseContext: func() context.Context {
 				return cmd.Context()
 			},
+			Logger: aLog,
+			IsFailure: func(err error) bool {
+
+				return true
+			},
+			ErrorHandler: asynq.ErrorHandlerFunc(reportError),
 		}
 
 		srv := asynq.NewServer(
@@ -87,6 +96,17 @@ to quickly create a Cobra application.`,
 			log.Fatal().Err(err).Msg("could not run server")
 		}
 	},
+}
+
+func reportError(ctx context.Context, task *asynq.Task, err error) {
+	log := zerolog.Ctx(ctx).With().Logger()
+	retried, _ := asynq.GetRetryCount(ctx)
+	maxRetry, _ := asynq.GetMaxRetry(ctx)
+	log = log.With().Int("retried", retried).Int("maxRetry", maxRetry).Logger()
+
+	if retried >= maxRetry {
+		log.Error().Err(err).Msg("error handling task")
+	}
 }
 
 func InitCommand(parent *cobra.Command) {
@@ -127,22 +147,31 @@ func aggregateHandler(group string, tasks []*asynq.Task) *asynq.Task {
 }
 
 func handleAggregatedTask(ctx context.Context, task *asynq.Task) error {
+	var err error
 	log := zerolog.Ctx(ctx).With().Logger()
 	log.Info().Msg("Handler received aggregated task")
 	final := &aggregatedPayloads{}
-
-	if err := json.Unmarshal(task.Payload(), &final); err != nil {
+	groupS := &models.Group{}
+	err = json.Unmarshal(task.Payload(), &final)
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal([]byte(final.Group), groupS)
+	if err != nil {
 		return err
 	}
 	// create a temporary struct to unmarshal the payload
 	type summary struct {
-		Group string
+		Group *models.Group
 		Total int
 	}
 	summaryV := &summary{
-		Group: final.Group,
+		Group: groupS,
 		Total: len(final.Payloads),
 	}
+
+	// you have to eat the error here so that this task doesn't get into a retry loop and finally archived.
+	// t
 	log.Info().Interface("summary", summaryV).Msg("unmarshalling payload")
 	return nil
 }
