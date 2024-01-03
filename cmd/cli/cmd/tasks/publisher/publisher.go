@@ -45,8 +45,9 @@ to quickly create a Cobra application.`,
 		options = append(options, asynq.MaxRetry(maxRetry))
 		if len(group) > 0 {
 			gg := &models.Group{
-				OrgId: group,
-				Event: "some:event",
+				AppID:   group,
+				Event:   "some:event",
+				Channel: "$default",
 			}
 			groupS, err := json.Marshal(gg)
 			if err != nil {

@@ -1,6 +1,7 @@
 package models
 
 type Group struct {
-	OrgId string
-	Event string
+	AppID   string
+	Event   string
+	Channel string
 }
