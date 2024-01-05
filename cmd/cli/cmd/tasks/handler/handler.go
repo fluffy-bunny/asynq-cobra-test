@@ -112,7 +112,7 @@ func reportError(ctx context.Context, task *asynq.Task, err error) {
 func InitCommand(parent *cobra.Command) {
 	parent.AddCommand(handlerCmd)
 
-	handlerCmd.Flags().StringArrayVarP(&queues, "queues", "q", []string{"critical:6", "default:3", "low:1", "aggregate:3"}, "queues to listen to")
+	handlerCmd.Flags().StringArrayVarP(&queues, "queues", "q", []string{"$default:3", "org0001:3", "org002:3"}, "queues to listen to")
 	handlerCmd.Flags().BoolVarP(&fail, "fail", "f", false, "fail to handle the task")
 
 }

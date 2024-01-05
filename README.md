@@ -107,3 +107,17 @@ Same test, but 1000 upfront messages.
 This time bringing up the second server helped and both were running.  The good server was now handling the messages.  
 
 However once the numbers got down to around 40 unprocesses failed messages the failing server seems to camp on that small set and every now and then the good server will peel one off.  From the looks of it I may be sitting here for hours hoping the good server finally gets to process them all.  
+
+## Aggregate example
+
+### Handler
+
+```bash
+go run ./cmd/cli tasks handler
+```
+
+### Publisher
+
+```bash
+go run ./cmd/cli tasks publisher -q org0001 -c 1000 -a org001
+```

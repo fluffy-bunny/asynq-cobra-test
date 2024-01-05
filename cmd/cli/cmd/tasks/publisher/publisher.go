@@ -18,7 +18,7 @@ import (
 var count int
 var queuename string
 var fail bool
-var group string
+var appID string
 var maxRetry int
 
 // publisherCmd represents the publisher command
@@ -43,9 +43,9 @@ to quickly create a Cobra application.`,
 			options = append(options, asynq.Queue(queuename))
 		}
 		options = append(options, asynq.MaxRetry(maxRetry))
-		if len(group) > 0 {
+		if len(appID) > 0 {
 			gg := &models.Group{
-				AppID:   group,
+				AppID:   appID,
 				Event:   "some:event",
 				Channel: "$default",
 			}
@@ -82,7 +82,7 @@ func InitCommand(parent *cobra.Command) {
 	publisherCmd.Flags().IntVar(&maxRetry, "maxRetry", 3, "max retry")
 
 	publisherCmd.Flags().BoolVarP(&fail, "fail", "f", false, "fail to handle the task")
-	publisherCmd.Flags().StringVarP(&group, "group", "g", "", "enque to an aggregate group")
+	publisherCmd.Flags().StringVarP(&appID, "appid", "a", "", "enque to an app group")
 
 	publisherCmd.Flags().StringVarP(&queuename, "queuename", "q", "", "queuename")
 }
